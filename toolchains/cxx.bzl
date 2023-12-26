@@ -181,7 +181,10 @@ system_cxx_toolchain = rule(
         "compiler_type": attrs.string(default = "windows" if host_info().os.is_windows else "clang"),  # one of CxxToolProviderType
         "cpp_dep_tracking_mode": attrs.string(default = "makefile"),
         "cxx_compiler": attrs.string(default = "cl.exe" if host_info().os.is_windows else "clang++"),
-        "cxx_flags": attrs.list(attrs.string(), default = ["/Wall", "/std:c++17"]),
+        # Enable all warnings
+        # use C++17 language standard
+        # disable C4820 (padding bytes added to end of class)
+        "cxx_flags": attrs.list(attrs.string(), default = ["/Wall", "/std:c++17", "/wd4820"]),
         "link_flags": attrs.list(attrs.string(), default = []),
         "link_ordering": attrs.option(attrs.enum(LinkOrdering.values()), default = None),
         "link_style": attrs.string(default = "shared"),
