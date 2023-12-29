@@ -184,8 +184,9 @@ system_cxx_toolchain = rule(
         # Enable all warnings
         # use C++17 language standard
         # disable C4820 (padding bytes added to end of class)
-        "cxx_flags": attrs.list(attrs.string(), default = ["/Wall", "/std:c++17", "/wd4820"]),
-        "link_flags": attrs.list(attrs.string(), default = []),
+        "cxx_flags": attrs.list(attrs.string(), default = ["/Wall", "/std:c++20", "/wd4820"]),
+        # Needed to properly locate gtest_main entrypoint
+        "link_flags": attrs.list(attrs.string(), default = ["/SUBSYSTEM:CONSOLE",]),
         "link_ordering": attrs.option(attrs.enum(LinkOrdering.values()), default = None),
         "link_style": attrs.string(default = "shared"),
         "linker": attrs.string(default = "link.exe" if host_info().os.is_windows else "clang++"),
