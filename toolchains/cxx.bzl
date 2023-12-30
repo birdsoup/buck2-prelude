@@ -177,16 +177,25 @@ system_cxx_toolchain = rule(
     impl = _system_cxx_toolchain_impl,
     attrs = {
         "c_flags": attrs.list(attrs.string(), default = []),
-        "compiler": attrs.string(default = "cl.exe" if host_info().os.is_windows else "clang"),
+        "compiler": attrs.string(default = "clang-cl.exe" if host_info().os.is_windows else "clang"),
         "compiler_type": attrs.string(default = "windows" if host_info().os.is_windows else "clang"),  # one of CxxToolProviderType
         "cpp_dep_tracking_mode": attrs.string(default = "makefile"),
-        "cxx_compiler": attrs.string(default = "cl.exe" if host_info().os.is_windows else "clang++"),
-        # Enable all warnings
-        # use C++17 language standard
-        # disable C4820 (padding bytes added to end of class)
-        "cxx_flags": attrs.list(attrs.string(), default = ["/Wall", "/std:c++20", "/wd4820"]),
+        "cxx_compiler": attrs.string(default = "clang-cl.exe" if host_info().os.is_windows else "clang++"),
+        "cxx_flags": attrs.list(attrs.string(), default = [
+            "/Wall", 
+            "/std:c++20", 
+            "/EHa", # enable exceptions on clang-cl
+            #"/wd4820", # disable padding warning on cl.exe
+            # spam warnings
+            "-Wno-c++98-compat", 
+            "-Wno-c++98-compat-pedantic", 
+            # may actually need to resolve these at some point
+            "-Wno-global-constructors",
+            "-Wno-exit-time-destructors",
+            "-m64",
+        ]),
         # Needed to properly locate gtest_main entrypoint
-        "link_flags": attrs.list(attrs.string(), default = ["/SUBSYSTEM:CONSOLE",]),
+        "link_flags": attrs.list(attrs.string(), default = ["/SUBSYSTEM:CONSOLE", "/machine:X64"]),
         "link_ordering": attrs.option(attrs.enum(LinkOrdering.values()), default = None),
         "link_style": attrs.string(default = "shared"),
         "linker": attrs.string(default = "link.exe" if host_info().os.is_windows else "clang++"),
